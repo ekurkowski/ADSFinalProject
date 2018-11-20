@@ -57,7 +57,8 @@ void procOldMsgSmartWord(char *oldMessageFile)
 {
 
    // can we normalize everything to be lowercase before we put it in the database?
-
+   // useful link to make a new function that removes everything but letters
+   // https://www.programiz.com/c-programming/examples/remove-characters-string
 }
 
 
@@ -117,9 +118,9 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,
 
 
   // just to show how to return 3 (poor) guesses
-  strcpy(guesses[0], "abc");
-  strcpy(guesses[1], "defgh");
-  strcpy(guesses[2], "ijk");
+  strcpy(guesses[0], guess_one->word);
+  strcpy(guesses[1], guess_two->word);
+  strcpy(guesses[2], guess_three->word);
 }
 
 
