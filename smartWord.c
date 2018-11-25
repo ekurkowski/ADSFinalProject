@@ -19,11 +19,128 @@
 
 #include "smartWord.h"
 
-typedef struct node {
-    int count; // number of times used
-    char word[MAX_WORDLEN]; // possible word to be used
-    struct node *next;
-} Word;
+#include <ctype.h>
+
+struct hash{
+	struct inter *range[26];
+}*alpha_hash[26];
+
+struct inter{
+	struct node *head;
+	struct node *tail;
+};
+
+struct node{
+	char pos_word[MAX_WORDLEN];
+	int score; // number of times used 
+	struct node *next;
+};
+
+void create_space();
+void initSmartWord(char word[100]);
+void procOldMsgSmartWord(char word[100]);
+int find_word(char word[100],int index,int index_2);
+
+void create_space(){
+	for(int i=0;i<26;i++){
+		alpha_hash[i] = (struct hash*) malloc(sizeof(struct hash));
+		for(int j=0;j<26;j++){
+			alpha_hash[i]->range[j] = (struct inter*) malloc(sizeof(struct inter));
+		}
+	}
+	return;
+}
+
+
+void insert(char word[100],int index,int index_2){
+	struct node *temp;
+	struct node *list = (struct node*) alpha_hash[index]->range[index_2]->head;
+	struct node *new_node = (struct node*) malloc(sizeof(struct node));
+	strcpy(new_node->pos_word,word);
+	new_node->next = NULL;
+	new_node->score = 1;
+
+	if(list == NULL){ //if list is empty in index
+		alpha_hash[index]->range[index_2]->head = new_node;
+		alpha_hash[index]->range[index_2]->tail = new_node;
+	}
+	else{ //if list is not empty
+		temp = alpha_hash[index]->range[index_2]->tail;
+		temp->next = new_node;
+		alpha_hash[index]->range[index_2]->tail = new_node;
+	}
+	//printf("\nSuccess added %s at inde x %d and %d",word,index,index_2);
+
+	return;
+}
+
+void initSmartWord(char word[100]){
+	int length = strlen(word);
+	int f_c_value,s_c_value;  //first_character_value and second
+	for(int i=0;i<length;i++){  //sets word to lowercase
+		word[i] = tolower(word[i]);
+	}
+
+	f_c_value = word[0];  //gets ascii numerical value
+	s_c_value = word[1];
+
+	f_c_value = f_c_value%97; //mods number by 97 to get specific index to put word at in hash tables
+	s_c_value = s_c_value%97;
+	insert(word,f_c_value,s_c_value);
+
+	return;
+}
+
+void procOldMsgSmartWord(char word[100]){
+	int length = strlen(word);
+	int f_c_value,s_c_value; //first_character_value and second
+	int found_ctr;
+	for(int i=0;i<length;i++){  //sets word to lowercase
+		word[i] = tolower(word[i]);
+	}
+
+	f_c_value = word[0];  //gets ascii numerical value
+	s_c_value = word[1];
+
+	f_c_value = f_c_value%97; //mods number by 97 to get specific index to put word at in hash tables
+	s_c_value = s_c_value%97;
+
+	found_ctr = find_word(word,f_c_value,s_c_value);
+
+	if(found_ctr == 0){ //if word was not found it will insert it into the structure
+		insert(word,f_c_value,s_c_value);
+	}
+
+	return ;
+}
+
+int find_word(char word[100],int index,int index_2){
+	struct node *temp;
+	temp = alpha_hash[index]->range[index_2]->head;
+
+	while(strcmp(temp->pos_word,word) != 0){ //loops through range to see if word is in it
+		temp = temp->next;
+	}
+	if(strcmp(temp->pos_word,word) == 0){  //if word was found in structure
+		temp->score = temp->score + 1; //update score
+		return 1;
+	}
+	else{  //if word wasnt already found in structure
+		return 0;
+	}
+}
+
+void print_list(){
+	struct node *temp;
+
+	temp = alpha_hash[0]->range[1]->head;
+	while(temp != NULL){
+		printf("\n%s",temp->pos_word);
+		temp = temp->next;
+	}
+	return;
+}
+
 
 Word *StartGuess = NULL;
 Word *EndGuess = NULL;
@@ -75,9 +192,7 @@ void GetHighestScores(Word *one, Word *two, Word *three, Word *four) {
 // Return via a parameter:
 //   gueses: NUM_GUESSES (3) word guesses (case-insensive comparison is used)
 
-void guessSmartWord(char letter, int letterPosition, int wordPosition,
-	   char guesses[NUM_GUESSES][MAX_WORDLEN+1])
-{
+void guessSmartWord(char letter, int letterPosition, int wordPosition,char guesses[NUM_GUESSES][MAX_WORDLEN+1]) {
   Word *ptr = NULL;
   Word *guess_one;
   Word *guess_two;
