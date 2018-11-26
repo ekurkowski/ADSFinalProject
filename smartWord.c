@@ -74,9 +74,11 @@ void insert(char word[100],int index,int index_2){
 }
 
 void initSmartWord(char *wordFile){
+  FILE *in_file;
+  in_file = fopen(wordFile, "r");
   create_space();//functions mallocs all possible indexs in hashtables
 	char word[100];
-	while(fscanf(wordFile,"%s",word)==1){ //reads entire words.txt file
+	while(fscanf(in_file,"%s",word)==1){ //reads entire words.txt file
   	int length = strlen(word);
   	int f_c_value,s_c_value;  //first_character_value and second
   	for(int i=0;i<length;i++){  //sets word to lowercase
@@ -95,8 +97,10 @@ void initSmartWord(char *wordFile){
 }
 
 void procOldMsgSmartWord(char *wordFile){
+  FILE *in_file;
+  in_file = fopen(wordFile, "r");
   char word[100];
-  while(fscanf(wordFile,"%s",word)==1){  //reads entire old_tweets files
+  while(fscanf(in_file,"%s",word)==1){  //reads entire old_tweets files
   	int length = strlen(word);
   	int f_c_value,s_c_value; //first_character_value and second
   	int found_ctr;
@@ -263,4 +267,8 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
 
 void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
 
+}
+
+int main() {
+  
 }
