@@ -152,9 +152,11 @@ void print_list(){
 }
 
 
-Word *StartGuess = NULL;
+struct inter *StartGuess = NULL;
+Word *beginGuess = NULL;
 Word *EndGuess = NULL;
 Word *PrevGuessed = NULL;
+int hashval = 0;
 
 /*
   Description for each function, parameter, and return value (if any)
@@ -178,9 +180,13 @@ bool guessed(char word[MAX_WORDLEN]) {
   return false;
 }
 
+// adds the word onto the list of guessed words
 void append(char word[MAX_WORDLEN]) {
   Word *newGuess = (Word *)malloc(sizeof(Word));
   strcpy(newGuess->pos_word, word);
+
+  newGuess->next = PrevGuessed;
+  PrevGuessed = newGuess;
 }
 
 
@@ -196,43 +202,66 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   Word *guess_one;
   Word *guess_two;
   Word *guess_three;
+  letter = tolower(letter);
   // pay attention to upper and lowercase input
 
   if (letterPosition == 0) {
-    int hashval = letter % 97;
-    //StartGuess = alpha_hash[hashval];
-    // StartGuess = the same pointer as the letter in the array
-    ptr = StartGuess;
-    // iterate through all of the possible words and return highest three
-    // return
-  }
+    hashval = letter % 97;
+    StartGuess = alpha_hash[hashval]->range[0];
+    guess_one = StartGuess->head;
+    guess_two = StartGuess->head->next;
+    guess_three = StartGuess->head->next->next;
 
-  if (letterPosition == 1) {
-    // move StartGuess to the beginning of that linked list in the sub array
-    ptr = StartGuess;
-    // iterate through and find three highest scores in the list and copy to the guesses
-    // set EndGuess once reach the end
-    // return
-  }
+    int i = 0;
+    for (i = 0; i < 26; i++) {
+      ptr = alpha_hash[hashval]->range[i]->head;
 
-  ptr = StartGuess;
-  // move StartGuess to where it matches the letter of the word
-  while (ptr->pos_word[letterPosition] != tolower(letter)) {
-      ptr = ptr->next;
-  }
+      while (ptr != NULL) {
+        if (!guessed(ptr->pos_word)) {
+          GetHighestScores(guess_one, guess_two, guess_three, ptr);
+        }
+        ptr = ptr->next;
+      }
+      // StartGuess = the same pointer as the letter in the array
 
-  StartGuess = ptr;
-  guess_one = ptr;
-  guess_two = ptr->next;
-  guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
-
-  while (ptr->pos_word[letterPosition] != tolower(letter)) {
-    if (!guessed(ptr->pos_word)) {
-
+      // iterate through all of the possible words and return highest three
     }
-    GetHighestScores(guess_one, guess_two, guess_three, ptr);
-    ptr = ptr->next;
-  }
+  } else if (letterPosition == 1) {
+    // move StartGuess to the beginning of that linked list in the sub array
+    StartGuess = alpha_hash[hashval]->range[letter % 97];
+    beginGuess = StartGuess->head;
+    ptr = beginGuess;
+
+    guess_one = ptr;
+    guess_two = ptr->next;
+    guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
+
+    while (ptr != StartGuess->tail) {
+      if (!guessed(ptr->pos_word)) {
+        GetHighestScores(guess_one, guess_two, guess_three, ptr);
+      }
+      ptr = ptr->next;
+    }
+  } else {
+
+      ptr = beginGuess;
+      // move beginGuess to where it matches the letter of the word in alphabetical order
+      while (ptr->pos_word[letterPosition] != tolower(letter) && ptr->pos_word[letterPosition-1] == beginGuess->pos_word[letterPosition-1]) {
+          ptr = ptr->next;
+      }
+
+      beginGuess = ptr;
+      guess_one = ptr;
+      guess_two = ptr->next;
+      guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
+
+      while (ptr->pos_word[letterPosition] == tolower(letter)) {
+        if (!guessed(ptr->pos_word)) {
+          GetHighestScores(guess_one, guess_two, guess_three, ptr);
+        }
+        ptr = ptr->next;
+      }
+    }
 
   // return the three guesses
   strcpy(guesses[0], guess_one->pos_word);
@@ -240,9 +269,9 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   strcpy(guesses[2], guess_three->pos_word);
 
   // add the three guesses onto the guessed list
-  append(guess_one->pos_word);
-  append(guess_two->pos_word);
   append(guess_three->pos_word);
+  append(guess_two->pos_word);
+  append(guess_one->pos_word);
 }
 
 
@@ -270,5 +299,5 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
 }
 
 int main() {
-  
+
 }
