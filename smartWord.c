@@ -230,8 +230,6 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   // pay attention to upper and lowercase input
 
   if (letterPosition == 0) {
-      free(PrevGuessed);
-      PrevGuessed = NULL;
     hashval = letter % 97;
     StartGuess = alpha_hash[hashval]->range[0];
     guess_one = StartGuess->head;
@@ -321,5 +319,8 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
 // values for bool: true (1), false (0)
 
 void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
-
+    if (isCorrectGuess == 1) {
+        free(PrevGuessed);
+        PrevGuessed = NULL;
+    }
 }
