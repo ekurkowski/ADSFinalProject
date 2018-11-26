@@ -74,8 +74,13 @@ void insert(char word[100],int index,int index_2){
 }
 
 void initSmartWord(char *wordFile){
+
   FILE *in_file;
   in_file = fopen(wordFile, "r");
+	if (in_file == NULL) {
+		printf("error opening file");
+	}
+
   create_space();//functions mallocs all possible indexs in hashtables
 	char word[100];
 	while(fscanf(in_file,"%s",word)==1){ //reads entire words.txt file
@@ -206,6 +211,8 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   // pay attention to upper and lowercase input
 
   if (letterPosition == 0) {
+      free(PrevGuessed);
+      PrevGuessed = NULL;
     hashval = letter % 97;
     StartGuess = alpha_hash[hashval]->range[0];
     guess_one = StartGuess->head;
@@ -246,7 +253,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
 
       ptr = beginGuess;
       // move beginGuess to where it matches the letter of the word in alphabetical order
-      while (ptr->pos_word[letterPosition] != tolower(letter) && ptr->pos_word[letterPosition-1] == beginGuess->pos_word[letterPosition-1]) {
+      while (ptr->pos_word[letterPosition] != letter && ptr->pos_word[letterPosition-1] == beginGuess->pos_word[letterPosition-1]) {
           ptr = ptr->next;
       }
 
@@ -255,7 +262,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
       guess_two = ptr->next;
       guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
 
-      while (ptr->pos_word[letterPosition] == tolower(letter)) {
+      while (ptr->pos_word[letterPosition] == letter) {
         if (!guessed(ptr->pos_word)) {
           GetHighestScores(guess_one, guess_two, guess_three, ptr);
         }
@@ -295,9 +302,5 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
 // values for bool: true (1), false (0)
 
 void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
-
-}
-
-int main() {
 
 }
