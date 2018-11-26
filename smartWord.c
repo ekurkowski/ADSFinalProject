@@ -172,6 +172,25 @@ void GetHighestScores(Word *one, Word *two, Word *three, Word *four) {
   // return the highest three scores out of the four
   // this might not be super efficient and could use some help I think
   // 3 words already in list then fourth is checking the lowest ranked of the three guesses if it is higher check if it is also higher then the second if it is check if it is higher than the first, whenever it finds one that it's lower than stop and replace except if it is lower than the lowest one then return null
+  Word *temp;
+  if (three->score < four->score) {
+	  if (two->score < four->score) {
+		  if (one->score < four->score) {
+			  temp = one;
+			  one = four;
+			  three = two;
+			  two = temp;
+		  } else {
+			  temp = two;
+			  two = four;
+			  three = temp;
+		  }
+	  } else {
+		  three = four;
+	  }
+  } else {
+	  return;
+  } 
 }
 
 bool guessed(char word[MAX_WORDLEN]) {
