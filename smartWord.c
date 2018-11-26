@@ -322,5 +322,9 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
     if (isCorrectGuess == 1) {
         free(PrevGuessed);
         PrevGuessed = NULL;
+        int index_1, index_2;
+        index_1 = correctWord[0] % 97;
+        index_2 = correctWord[1] % 97;
+        find_word(correctWord, index_1, index_2);
     }
 }
