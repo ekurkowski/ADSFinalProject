@@ -25,7 +25,7 @@ void procOldMsgSmartWord(char *oldMessageFile);
 void guessSmartWord(char letter, int letterPosition, int wordPosition,
 	   char guesses[NUM_GUESSES][MAX_WORDLEN+1]);
 
-void feedbackSmartWord(bool isCorrectGuess, char *correctWord);        
+void feedbackSmartWord(bool isCorrectGuess, char *correctWord);
 
 
 #endif
