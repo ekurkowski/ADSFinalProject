@@ -50,8 +50,7 @@ void create_space(){
 	return;
 }
 
-
-void insert(char word[100],int index,int index_2){
+void insert_wordsfile(char word[100],int index,int index_2){
 	struct node *temp;
 	struct node *list = (struct node*) alpha_hash[index]->range[index_2]->head;
 	struct node *new_node = (struct node*) malloc(sizeof(struct node));
@@ -70,6 +69,60 @@ void insert(char word[100],int index,int index_2){
 	}
 	//printf("\nSuccess added %s at inde x %d and %d",word,index,index_2);
 
+	return;
+}
+
+void insert_oldMes(char word[100],int index,int index_2){
+	struct node *temp,*prev;
+	struct node *list = (struct node*) alpha_hash[index]->range[index_2]->head;
+	struct node *new_node = (struct node*) malloc(sizeof(struct node));
+	strcpy(new_node->pos_word,word);
+	new_node->next = NULL;
+	new_node->score = 1;
+	
+
+	if(list == NULL){ //if list is empty 
+		//printf(" F");
+		//printf("\n%s",word);
+		alpha_hash[index]->range[index_2]->head = new_node;
+		alpha_hash[index]->range[index_2]->tail = new_node;
+		
+	}
+	else{ //if list HAS MORE THAN 1 item
+		//printf("\n MORe");
+		temp = alpha_hash[index]->range[index_2]->head;
+		//printf("\n%s %s",temp->pos_word,word);
+		while(temp->next != NULL && (strcmp(temp->pos_word,word)<0)){//try to find place to add in list
+			if(strcmp(temp->pos_word,word) == 0){ //word already in 
+				return;
+			}
+			prev = temp;
+			temp = temp->next;
+		}
+		if(strcmp(temp->pos_word,word) == 0){ //word already in 
+			return;
+		}
+		if((strcmp(temp->pos_word,word) > 0) && (strcmp(temp->pos_word,alpha_hash[index]->range[index_2]->head->pos_word) == 0)){ //if added to front
+			//printf(" here1");
+			//printf("\n%s",word);
+			new_node->next = temp;
+			alpha_hash[index]->range[index_2]->head = new_node;
+		}
+		else if(temp->next == NULL && (strcmp(temp->pos_word,word)<0)){ //if added to end
+			//printf(" here2");
+			//printf("\n%s",word);
+			temp->next = new_node;
+			alpha_hash[index]->range[index_2]->tail = new_node;
+		}
+		else{ //added to middle
+			//printf(" here3");
+			//printf("\n%s",word);
+			prev->next = new_node;
+			new_node->next = temp;
+		}
+	}
+	//printf("\nSuccess added %s at inde x %d and %d",word,index,index_2);
+	
 	return;
 }
 
@@ -95,7 +148,7 @@ void initSmartWord(char *wordFile){
 
   	f_c_value = f_c_value%97; //mods number by 97 to get specific index to put word at in hash tables
   	s_c_value = s_c_value%97;
-  	insert(word,f_c_value,s_c_value);
+  	insert_wordsfile(word,f_c_value,s_c_value);
   }
 
 	return;
@@ -114,8 +167,9 @@ void procOldMsgSmartWord(char *wordFile){
   	}
 	
 	remove_special_c(word,length); //removes character
-
-	if(strcmp(word,"0") == 0){ //checks if its not even a word
+	
+	if(word[0] == '0'){ //checks if its not even a word
+		
 		return;
 	}
 
@@ -128,7 +182,7 @@ void procOldMsgSmartWord(char *wordFile){
   	found_ctr = find_word(word,f_c_value,s_c_value);
 
   	if(found_ctr == 0){ //if word was not found it will insert it into the structure
-  		insert(word,f_c_value,s_c_value);
+  		insert_oldMes(word,f_c_value,s_c_value);
   	}
   }
 // https://www.programiz.com/c-programming/examples/remove-characters-string
@@ -157,11 +211,20 @@ int find_word(char word[100],int index,int index_2){
 }
 
 void remove_special_c(char word[100],int len){
+	int zero_ctr=0;
 	for(int i=0;i<len;i++){
 		if(word[i] < 'a' || word[i] > 'z'){
 			word[i] = '0';
 		}
 	}
+	if(zero_ctr == len){ //word is not an accpetable word
+		len = 1;
+		word[0] = '0';
+		word[1] = '\0';
+		len = 1;
+		return;
+	}
+	
 	for(int i=0;i<len;i++){
 		if(word[i] == '0'){
 			for(int j=i;j<len;j++){
@@ -179,8 +242,15 @@ void remove_special_c(char word[100],int len){
 			len--;
 		}
 	}
+	if(word[0] == '0' && (word[1] > 'a' && word[1] < 'z')){ //if 1 character didnt get deleted
+		for(int j=0;j<len;j++){
+			word[j] = word[j+1];
+		}
+		word[len-1] = '\0';
+		len--;
+	}
 	
-	if(len==0){
+	if(len==0){ //if all characters git deleted it wasnt a word
 		len = 1;
 		word[0] = '0';
 		word[1] = '\0';
