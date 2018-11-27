@@ -112,6 +112,12 @@ void procOldMsgSmartWord(char *wordFile){
   	for(int i=0;i<length;i++){  //sets word to lowercase
   		word[i] = tolower(word[i]);
   	}
+	
+	remove_special_c(word,length); //removes character
+
+	if(strcmp(word,"0") == 0){ //checks if its not even a word
+		return;
+	}
 
   	f_c_value = word[0];  //gets ascii numerical value
   	s_c_value = word[1];
@@ -132,17 +138,55 @@ void procOldMsgSmartWord(char *wordFile){
 int find_word(char word[100],int index,int index_2){
 	struct node *temp;
 	temp = alpha_hash[index]->range[index_2]->head;
-
-	while(strcmp(temp->pos_word,word) != 0){ //loops through range to see if word is in it
+	if(temp == NULL){
+		return 0;
+	}
+	while(strcmp(temp->pos_word,word) != 0 && temp->next != NULL){ //loops through range to see if word is in it
 		temp = temp->next;
+		//printf("\nkyle %s %s",temp->pos_word,word);
 	}
 	if(strcmp(temp->pos_word,word) == 0){  //if word was found in structure
 		temp->score = temp->score + 1; //update score
+		//printf("here!");
 		return 1;
-	}
-	else{  //if word wasnt already found in structure
+	} 
+	else if(temp->next == NULL){  //if word wasnt already found in structure
+		//printf("here2");
 		return 0;
 	}
+}
+
+void remove_special_c(char word[100],int len){
+	for(int i=0;i<len;i++){
+		if(word[i] < 'a' || word[i] > 'z'){
+			word[i] = '0';
+		}
+	}
+	for(int i=0;i<len;i++){
+		if(word[i] == '0'){
+			for(int j=i;j<len;j++){
+				word[j] = word[j+1];
+			}
+			word[len-1] = '\0';
+			len--;
+		}
+		if(word[i] == '0'){
+			for(int j=i;j<len;j++){
+				word[j] = word[j+1];
+				word[j+1] = ' ';
+			}
+			word[len-1] = '\0';
+			len--;
+		}
+	}
+	
+	if(len==0){
+		len = 1;
+		word[0] = '0';
+		word[1] = '\0';
+	}
+	
+	return;
 }
 
 void print_list(){
