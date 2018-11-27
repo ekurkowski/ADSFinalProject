@@ -39,6 +39,7 @@ typedef struct node{
 
 void create_space();
 int find_word(char word[100],int index,int index_2);
+void remove_special_c(char word[100],int len);
 
 void create_space(){
 	for(int i=0;i<26;i++){
@@ -208,6 +209,7 @@ int find_word(char word[100],int index,int index_2){
 		//printf("here2");
 		return 0;
 	}
+    return 0;
 }
 
 void remove_special_c(char word[100],int len){
@@ -373,6 +375,21 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
     guess_one = ptr;
     guess_two = ptr->next;
     guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
+      
+      // if we do not have the word in our database, returns unknown
+      if (guess_three == NULL) {
+          if (guess_two == NULL) {
+              if (guess_one == NULL) {
+                  strcpy(guesses[0], "unknown");
+                  strcpy(guesses[1], "unknown");
+                  strcpy(guesses[2], "unknown");
+              }
+              strcpy(guesses[1], "unknown");
+              strcpy(guesses[2], "unknown");
+          }
+          strcpy(guesses[2], "unknown");
+          return;
+      }
 
     while (ptr != StartGuess->tail) {
       if (!guessed(ptr->pos_word)) {
@@ -437,8 +454,24 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
         free(PrevGuessed);
         PrevGuessed = NULL;
         int index_1, index_2;
+        for(int i=0;i<strlen(correctWord);i++){  //sets word to lowercase
+            correctWord[i] = tolower(correctWord[i]);
+        }
         index_1 = correctWord[0] % 97;
         index_2 = correctWord[1] % 97;
         find_word(correctWord, index_1, index_2);
+    }
+    if (isCorrectGuess == 0 && correctWord != NULL) {
+        free(PrevGuessed);
+        PrevGuessed = NULL;
+        int index_1, index_2;
+        for(int i=0;i<strlen(correctWord);i++){  //sets word to lowercase
+            correctWord[i] = tolower(correctWord[i]);
+        }
+        index_1 = correctWord[0] % 97;
+        index_2 = correctWord[1] % 97;
+        if (!find_word(correctWord, index_1, index_2)) {
+            insert(correctWord, index_1, index_2);
+        }
     }
 }
