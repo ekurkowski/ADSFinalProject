@@ -96,7 +96,7 @@ void preprocessingInSmartWord(char* wordFile, char *oldMessageFile)
   clock_t startTime, endTime;
   startTime = clock();
   initSmartWord(wordFile);
-  //procOldMsgSmartWord(oldMessageFile);
+  procOldMsgSmartWord(oldMessageFile);
   endTime = clock();
 
   printf("cpu time in seconds (not part of score): %.4e\n",
