@@ -275,7 +275,6 @@ void print_list(){
 
 struct inter *StartGuess = NULL;
 Word *beginGuess = NULL;
-Word *EndGuess = NULL;
 Word *PrevGuessed = NULL;
 int hashval = 0;
 
@@ -373,21 +372,29 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
     ptr = beginGuess;
 
     guess_one = ptr;
+      if (guess_one == NULL) {
+          strcpy(guesses[0], "unknown");
+          strcpy(guesses[1], "unknown");
+          strcpy(guesses[2], "unknown");
+          return;
+      }
     guess_two = ptr->next;
-    guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
+      if (guess_two == NULL) {
+          strcpy(guesses[0], guess_one->pos_word);
+          strcpy(guesses[1], "unknown");
+          strcpy(guesses[2], "unknown");
+          append(guesses[0]);
+          return;
+      }
       
+    guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
       // if we do not have the word in our database, returns unknown
       if (guess_three == NULL) {
-          if (guess_two == NULL) {
-              if (guess_one == NULL) {
-                  strcpy(guesses[0], "unknown");
-                  strcpy(guesses[1], "unknown");
-                  strcpy(guesses[2], "unknown");
-              }
-              strcpy(guesses[1], "unknown");
-              strcpy(guesses[2], "unknown");
-          }
+          strcpy(guesses[0], guess_one->pos_word);
+          strcpy(guesses[1], guess_two->pos_word);
           strcpy(guesses[2], "unknown");
+          append(guesses[0]);
+          append(guesses[1]);
           return;
       }
 
@@ -400,21 +407,59 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   } else {
 
       ptr = beginGuess;
+      if (beginGuess == NULL) {
+          strcpy(guesses[0], "unknown");
+          strcpy(guesses[1], "unknown");
+          strcpy(guesses[2], "unknown");
+          return;
+      }
       // move beginGuess to where it matches the letter of the word in alphabetical order
       while (ptr->pos_word[letterPosition] != letter && ptr->pos_word[letterPosition-1] == beginGuess->pos_word[letterPosition-1]) {
           ptr = ptr->next;
+          if (ptr == NULL) {
+              strcpy(guesses[0], "unknown");
+              strcpy(guesses[1], "unknown");
+              strcpy(guesses[2], "unknown");
+              return;
+          }
       }
 
       beginGuess = ptr;
       guess_one = ptr;
+      if (guess_one == NULL) {
+          strcpy(guesses[0], "unknown");
+          strcpy(guesses[1], "unknown");
+          strcpy(guesses[2], "unknown");
+          return;
+      }
       guess_two = ptr->next;
+      if (guess_two == NULL) {
+          strcpy(guesses[0], guess_one->pos_word);
+          strcpy(guesses[1], "unknown");
+          strcpy(guesses[2], "unknown");
+          append(guesses[0]);
+          return;
+      }
+      
       guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
+      // if we do not have the word in our database, returns unknown
+      if (guess_three == NULL) {
+          strcpy(guesses[0], guess_one->pos_word);
+          strcpy(guesses[1], guess_two->pos_word);
+          strcpy(guesses[2], "unknown");
+          append(guesses[0]);
+          append(guesses[1]);
+          return;
+      }
 
       while (ptr->pos_word[letterPosition] == letter) {
         if (!guessed(ptr->pos_word)) {
           GetHighestScores(guess_one, guess_two, guess_three, ptr);
         }
         ptr = ptr->next;
+          if (ptr == NULL) {
+              break;
+          }
       }
     }
 
@@ -471,7 +516,7 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
         index_1 = correctWord[0] % 97;
         index_2 = correctWord[1] % 97;
         if (!find_word(correctWord, index_1, index_2)) {
-            insert(correctWord, index_1, index_2);
+            insert_oldMes(correctWord, index_1, index_2);
         }
     }
 }
