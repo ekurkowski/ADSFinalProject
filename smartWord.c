@@ -37,44 +37,41 @@ typedef struct node{
 	struct node *next;
 } Word;
 
-void create_space();
-int find_word(char word[100],int index,int index_2);
-void remove_special_c(char word[100],int len);
-
 void create_space(){
-	for(int i=0;i<26;i++){
+    int i;
+	for(i=0;i<26;i++){
 		alpha_hash[i] = (struct hash*) malloc(sizeof(struct hash));
-		for(int j=0;j<26;j++){
+        int j;
+		for(j=0;j<26;j++){
 			alpha_hash[i]->range[j] = (struct inter*) malloc(sizeof(struct inter));
+            alpha_hash[i]->range[j]->head = NULL;
+            alpha_hash[i]->range[j]->tail = NULL;
 		}
 	}
 	return;
 }
 
 void insert_wordsfile(char word[100],int index,int index_2){
-	struct node *temp;
-	struct node *list = (struct node*) alpha_hash[index]->range[index_2]->head;
-	struct node *new_node = (struct node*) malloc(sizeof(struct node));
+	struct inter *list = alpha_hash[index]->range[index_2];
+    
+	Word *new_node = (Word*) malloc(sizeof(Word));
 	strcpy(new_node->pos_word,word);
 	new_node->next = NULL;
 	new_node->score = 1;
 
-	if(list == NULL){ //if list is empty in index
-		alpha_hash[index]->range[index_2]->head = new_node;
-		alpha_hash[index]->range[index_2]->tail = new_node;
+	if(list->head == NULL){ //if list is empty in index
+		list->head = new_node;
+		list->tail = new_node;
+	} else { //if list is not empty
+		list->tail->next = new_node;
+		list->tail = new_node;
 	}
-	else{ //if list is not empty
-		temp = alpha_hash[index]->range[index_2]->tail;
-		temp->next = new_node;
-		alpha_hash[index]->range[index_2]->tail = new_node;
-	}
-	//printf("\nSuccess added %s at inde x %d and %d",word,index,index_2);
 
 	return;
 }
 
 void insert_oldMes(char word[100],int index,int index_2){
-	struct node *temp,*prev;
+	struct node *temp,*prev = NULL;
 	struct node *list = (struct node*) alpha_hash[index]->range[index_2]->head;
 	struct node *new_node = (struct node*) malloc(sizeof(struct node));
 	strcpy(new_node->pos_word,word);
@@ -122,7 +119,6 @@ void insert_oldMes(char word[100],int index,int index_2){
 			new_node->next = temp;
 		}
 	}
-	//printf("\nSuccess added %s at inde x %d and %d",word,index,index_2);
 	
 	return;
 }
@@ -134,24 +130,29 @@ void initSmartWord(char *wordFile){
 	if (in_file == NULL) {
 		printf("error opening file");
 	}
-
   create_space();//functions mallocs all possible indexs in hashtables
 	char word[100];
 	while(fscanf(in_file,"%s",word)==1){ //reads entire words.txt file
-  	int length = strlen(word);
-  	int f_c_value,s_c_value;  //first_character_value and second
-  	for(int i=0;i<length;i++){  //sets word to lowercase
-  		word[i] = tolower(word[i]);
-  	}
+        int length = (int)strlen(word);
+        int f_c_value,s_c_value;  //first_character_value and second
+        int i;
+        for(i=0;i<length;i++){  //sets word to lowercase
+            word[i] = tolower(word[i]);
+        }
 
-  	f_c_value = word[0];  //gets ascii numerical value
-  	s_c_value = word[1];
+        f_c_value = word[0];  //gets ascii numerical value
+        
+        
+        if (length == 1) {
+            s_c_value = word[0];
+        } else {
+            s_c_value = word[1];
+        }
 
-  	f_c_value = f_c_value%97; //mods number by 97 to get specific index to put word at in hash tables
-  	s_c_value = s_c_value%97;
-  	insert_wordsfile(word,f_c_value,s_c_value);
-  }
-
+        f_c_value = f_c_value%97; //mods number by 97 to get specific index to put word at in hash tables
+        s_c_value = s_c_value%97;
+        insert_wordsfile(word,f_c_value,s_c_value);
+      }
 	return;
 }
 
@@ -160,10 +161,11 @@ void procOldMsgSmartWord(char *wordFile){
   in_file = fopen(wordFile, "r");
   char word[100];
   while(fscanf(in_file,"%s",word)==1){  //reads entire old_tweets files
-  	int length = strlen(word);
+  	int length = (int)strlen(word);
   	int f_c_value,s_c_value; //first_character_value and second
   	int found_ctr;
-  	for(int i=0;i<length;i++){  //sets word to lowercase
+      int i;
+  	for(i=0;i<length;i++){  //sets word to lowercase
   		word[i] = tolower(word[i]);
   	}
 	
@@ -186,7 +188,6 @@ void procOldMsgSmartWord(char *wordFile){
   		insert_oldMes(word,f_c_value,s_c_value);
   	}
   }
-// https://www.programiz.com/c-programming/examples/remove-characters-string
 	return ;
 }
 
@@ -196,17 +197,14 @@ int find_word(char word[100],int index,int index_2){
 	if(temp == NULL){
 		return 0;
 	}
-	while(strcmp(temp->pos_word,word) != 0 && temp->next != NULL){ //loops through range to see if word is in it
+	while(strcmp(temp->pos_word,word) < 0 && temp->next != NULL){ //loops through range to see if word is in it
 		temp = temp->next;
-		//printf("\nkyle %s %s",temp->pos_word,word);
 	}
 	if(strcmp(temp->pos_word,word) == 0){  //if word was found in structure
 		temp->score = temp->score + 1; //update score
-		//printf("here!");
 		return 1;
 	} 
 	else if(temp->next == NULL){  //if word wasnt already found in structure
-		//printf("here2");
 		return 0;
 	}
     return 0;
@@ -214,7 +212,8 @@ int find_word(char word[100],int index,int index_2){
 
 void remove_special_c(char word[100],int len){
 	int zero_ctr=0;
-	for(int i=0;i<len;i++){
+    int i;
+	for(i=0;i<len;i++){
 		if(word[i] < 'a' || word[i] > 'z'){
 			word[i] = '0';
 		}
@@ -226,17 +225,18 @@ void remove_special_c(char word[100],int len){
 		len = 1;
 		return;
 	}
-	
-	for(int i=0;i<len;i++){
+	for(i=0;i<len;i++){
 		if(word[i] == '0'){
-			for(int j=i;j<len;j++){
+            int j;
+			for(j=i;j<len;j++){
 				word[j] = word[j+1];
 			}
 			word[len-1] = '\0';
 			len--;
 		}
 		if(word[i] == '0'){
-			for(int j=i;j<len;j++){
+            int j;
+			for(j=i;j<len;j++){
 				word[j] = word[j+1];
 				word[j+1] = ' ';
 			}
@@ -245,7 +245,8 @@ void remove_special_c(char word[100],int len){
 		}
 	}
 	if(word[0] == '0' && (word[1] > 'a' && word[1] < 'z')){ //if 1 character didnt get deleted
-		for(int j=0;j<len;j++){
+        int j;
+		for(j=0;j<len;j++){
 			word[j] = word[j+1];
 		}
 		word[len-1] = '\0';
@@ -348,8 +349,29 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
     hashval = letter % 97;
     StartGuess = alpha_hash[hashval]->range[0];
     guess_one = StartGuess->head;
+      if (guess_one == NULL) {
+          strcpy(guesses[0], "unknown");
+          strcpy(guesses[1], "unknown");
+          strcpy(guesses[2], "unknown");
+          return;
+      }
     guess_two = StartGuess->head->next;
+      if (guess_two == NULL) {
+          strcpy(guesses[0], guess_one->pos_word);
+          strcpy(guesses[1], "unknown");
+          strcpy(guesses[2], "unknown");
+          append(guesses[0]);
+          return;
+      }
     guess_three = StartGuess->head->next->next;
+      if (guess_three == NULL) {
+          strcpy(guesses[0], guess_one->pos_word);
+          strcpy(guesses[1], guess_two->pos_word);
+          strcpy(guesses[2], "unknown");
+          append(guesses[0]);
+          append(guesses[1]);
+          return;
+      }
 
     int i = 0;
     for (i = 0; i < 26; i++) {
@@ -499,7 +521,8 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
         free(PrevGuessed);
         PrevGuessed = NULL;
         int index_1, index_2;
-        for(int i=0;i<strlen(correctWord);i++){  //sets word to lowercase
+        int i;
+        for(i=0;i<strlen(correctWord);i++){  //sets word to lowercase
             correctWord[i] = tolower(correctWord[i]);
         }
         index_1 = correctWord[0] % 97;
@@ -510,7 +533,8 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
         free(PrevGuessed);
         PrevGuessed = NULL;
         int index_1, index_2;
-        for(int i=0;i<strlen(correctWord);i++){  //sets word to lowercase
+        int i;
+        for(i=0;i<strlen(correctWord);i++){  //sets word to lowercase
             correctWord[i] = tolower(correctWord[i]);
         }
         index_1 = correctWord[0] % 97;
