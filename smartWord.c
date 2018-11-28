@@ -38,7 +38,7 @@ typedef struct node{
 	struct node *next;
 } Word;
 
-
+// allocates memory for the hash and subtable
 void create_space(){
     int i;
 	for(i=0;i<26;i++){
@@ -53,6 +53,7 @@ void create_space(){
 	return;
 }
 
+// inserts words from the words.txt file. Already alphabetized, so don't spend time checking
 void insert_wordsfile(char word[100],int index,int index_2){
 	struct inter *list = alpha_hash[index]->range[index_2];
     
@@ -72,6 +73,7 @@ void insert_wordsfile(char word[100],int index,int index_2){
 	return;
 }
 
+// inserts words form the old messages in alphabetical order
 void insert_oldMes(char word[100],int index,int index_2){
 	struct node *temp,*prev = NULL;
 	struct node *list = (struct node*) alpha_hash[index]->range[index_2]->head;
@@ -125,6 +127,7 @@ void insert_oldMes(char word[100],int index,int index_2){
 	return;
 }
 
+// initializes smart word by creating the database and inserting the given words
 void initSmartWord(char *wordFile){
 
   FILE *in_file;
@@ -158,6 +161,7 @@ void initSmartWord(char *wordFile){
 	return;
 }
 
+// inserts the words from the old message file into the database
 void procOldMsgSmartWord(char *wordFile){
   FILE *in_file;
   in_file = fopen(wordFile, "r");
@@ -193,6 +197,7 @@ void procOldMsgSmartWord(char *wordFile){
 	return ;
 }
 
+// sees if the word is already in database before adding. Avoids duplicate words and wasted space
 int find_word(char word[100],int index,int index_2){
 	struct node *temp;
 	temp = alpha_hash[index]->range[index_2]->head;
@@ -212,6 +217,7 @@ int find_word(char word[100],int index,int index_2){
     return 0;
 }
 
+// removes all characters from a string that are not letters
 void remove_special_c(char word[100],int len){
 	int zero_ctr=0;
     int i;
@@ -264,18 +270,6 @@ void remove_special_c(char word[100],int len){
 	return;
 }
 
-void print_list(){
-	struct node *temp;
-
-	temp = alpha_hash[0]->range[1]->head;
-	while(temp != NULL){
-		printf("\n%s",temp->pos_word);
-		temp = temp->next;
-	}
-	return;
-}
-
-
 struct inter *StartGuess = NULL; // keeps track of where word being guessed begins
 Word *beginGuess = NULL;   // keeps track of second letter of word being guessed
 Word *PrevGuessed = NULL; // list of the previously guessed for each word. Resets after word has been guessed
@@ -283,7 +277,6 @@ int hashval = 0; // which letter the word starts with
 
 // return the highest three scores out of the four
 void GetHighestScores(Word *one, Word *two, Word *three, Word *four) {
-  // 3 words already in list then fourth is checking the lowest ranked of the three guesses if it is higher check if it is also higher then the second if it is check if it is higher than the first, whenever it finds one that it's lower than stop and replace except if it is lower than the lowest one then return null
   Word *temp;
   if (three->score < four->score) {
 	  if (two->score < four->score) {
