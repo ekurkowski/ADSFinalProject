@@ -210,7 +210,12 @@ int find_word(char word[100],int index,int index_2){
 		temp = temp->next;
 	}
 	if(strcmp(temp->pos_word,word) == 0){  //if word was found in structure
-		temp->score = temp->score + 1; //update score
+		if(temp->score == 0){
+			temp->score = temp->score + 1;  //increment by 1 if already at 0
+		}
+		else if(temp->score >=1){
+			temp->score = temp->score * 2; //update score by a multplying score by 2 if already at 1
+		}
 		return 1;
 	} 
 	else if(temp->next == NULL){  //if word wasnt already found in structure
