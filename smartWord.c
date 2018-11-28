@@ -380,7 +380,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
       while (ptr != NULL) {
         if (!guessed(ptr->pos_word)) {
             // keeps the highest three scored words out of four
-          GetHighestScores(guess_one, guess_two, guess_three, ptr);
+            GetHighestScores(guess_one, guess_two, guess_three, ptr);
         }
         ptr = ptr->next;
       // iterate through all of the possible words and return highest three
