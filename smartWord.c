@@ -214,7 +214,7 @@ int find_word(char word[100],int index,int index_2){
 			temp->score = temp->score + 1;  //increment by 1 if already at 0
 		}
 		else if(temp->score >=1){
-			temp->score = temp->score * 2; //update score by a multplying score by 2 if already at 1
+			temp->score = temp->score + 2; //update score by a incremneting score by 2 if already at 1
 		}
 		return 1;
 	} 
