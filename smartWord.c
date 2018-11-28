@@ -493,6 +493,8 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   append(guess_three->pos_word);
   append(guess_two->pos_word);
   append(guess_one->pos_word);
+    
+    printf("Letter position: %d \n guesses: %s %s %s \n", letterPosition, guesses[0], guesses[1], guesses[2]);
   }
 
 
