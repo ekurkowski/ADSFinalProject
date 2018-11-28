@@ -21,21 +21,23 @@
 #include "smartWord.h"
 
 
-
+// first table for the alphabet
 struct hash{
-	struct inter *range[26];
+	struct inter *range[26]; // another table within the table to hold the second letter of the alphabet
 }*alpha_hash[26];
 
-struct inter{
+struct inter{ // list of alphabetized words that all start with the same first two letters
 	struct node *head;
 	struct node *tail;
 };
 
+// node to hold actual word and the score of the word
 typedef struct node{
-	char pos_word[MAX_WORDLEN];
+	char pos_word[MAX_WORDLEN]; // word used
 	int score; // number of times used
 	struct node *next;
 } Word;
+
 
 void create_space(){
     int i;
@@ -274,19 +276,13 @@ void print_list(){
 }
 
 
-struct inter *StartGuess = NULL;
-Word *beginGuess = NULL;
-Word *PrevGuessed = NULL;
-int hashval = 0;
+struct inter *StartGuess = NULL; // keeps track of where word being guessed begins
+Word *beginGuess = NULL;   // keeps track of second letter of word being guessed
+Word *PrevGuessed = NULL; // list of the previously guessed for each word. Resets after word has been guessed
+int hashval = 0; // which letter the word starts with
 
-/*
-  Description for each function, parameter, and return value (if any)
- */
-
-
+// return the highest three scores out of the four
 void GetHighestScores(Word *one, Word *two, Word *three, Word *four) {
-  // return the highest three scores out of the four
-  // this might not be super efficient and could use some help I think
   // 3 words already in list then fourth is checking the lowest ranked of the three guesses if it is higher check if it is also higher then the second if it is check if it is higher than the first, whenever it finds one that it's lower than stop and replace except if it is lower than the lowest one then return null
   Word *temp;
   if (three->score < four->score) {
@@ -309,15 +305,16 @@ void GetHighestScores(Word *one, Word *two, Word *three, Word *four) {
   } 
 }
 
+// checks to see if given word has been guessed already.
 bool guessed(char word[MAX_WORDLEN]) {
   Word *ptr = PrevGuessed;
   while (ptr != NULL) {
     if (strcmp(ptr->pos_word, word)==0) {
-      return true;
+      return true; // returns true if it has been guessed
     }
     ptr = ptr->next;
   }
-  return false;
+  return false; // false if it has not been guessed
 }
 
 // adds the word onto the list of guessed words
@@ -339,15 +336,17 @@ void append(char word[MAX_WORDLEN]) {
 
 void guessSmartWord(char letter, int letterPosition, int wordPosition,char guesses[NUM_GUESSES][MAX_WORDLEN+1]) {
   Word *ptr = NULL;
-  Word *guess_one;
+  Word *guess_one; // pointers to each of the nodes containing the possible guesses
   Word *guess_two;
   Word *guess_three;
   letter = tolower(letter);
-  // pay attention to upper and lowercase input
+  // pay attention to upper and lowercase input, this standardizes the letters to lowercase
 
-  if (letterPosition == 0) {
+  if (letterPosition == 0) { // first letter relates to first hash table of any word that begins with the given letter
     hashval = letter % 97;
     StartGuess = alpha_hash[hashval]->range[0];
+      
+      // these catches for unknown are in case there are not at least three guessed that even fit the given letters
     guess_one = StartGuess->head;
       if (guess_one == NULL) {
           strcpy(guesses[0], "unknown");
@@ -373,26 +372,27 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
           return;
       }
 
+      // iterates through all of the words that begin with this letter in the whole database
     int i = 0;
     for (i = 0; i < 26; i++) {
       ptr = alpha_hash[hashval]->range[i]->head;
 
       while (ptr != NULL) {
         if (!guessed(ptr->pos_word)) {
+            // keeps the highest three scored words out of four
           GetHighestScores(guess_one, guess_two, guess_three, ptr);
         }
         ptr = ptr->next;
-      }
-      // StartGuess = the same pointer as the letter in the array
-
       // iterate through all of the possible words and return highest three
+      }
     }
   } else if (letterPosition == 1) {
-    // move StartGuess to the beginning of that linked list in the sub array
+    // move StartGuess to the beginning of that linked list in the sub array. all possible words start with same two letters
     StartGuess = alpha_hash[hashval]->range[letter % 97];
     beginGuess = StartGuess->head;
     ptr = beginGuess;
 
+      // catch in case not three words in database that start with given first and second letter
     guess_one = ptr;
       if (guess_one == NULL) {
           strcpy(guesses[0], "unknown");
@@ -409,7 +409,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
           return;
       }
       
-    guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
+    guess_three = ptr->next->next;
       // if we do not have the word in our database, returns unknown
       if (guess_three == NULL) {
           strcpy(guesses[0], guess_one->pos_word);
@@ -420,14 +420,16 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
           return;
       }
 
+      // iterates through every word that begins with the two letters given
     while (ptr != StartGuess->tail) {
       if (!guessed(ptr->pos_word)) {
-        GetHighestScores(guess_one, guess_two, guess_three, ptr);
+        GetHighestScores(guess_one, guess_two, guess_three, ptr); // keeps highest scoring words that haven't been guessed yet
       }
       ptr = ptr->next;
     }
   } else {
 
+      // moves down the list to the next letter, slowly fewer and fewer guesses as we get more letters
       ptr = beginGuess;
       if (beginGuess == NULL) {
           strcpy(guesses[0], "unknown");
@@ -446,6 +448,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
           }
       }
 
+      // catches in case there are not enough words that fit the criteria
       beginGuess = ptr;
       guess_one = ptr;
       if (guess_one == NULL) {
@@ -463,7 +466,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
           return;
       }
       
-      guess_three = ptr->next->next; // pay attention to make sure this isn't the end of the list
+      guess_three = ptr->next->next;
       // if we do not have the word in our database, returns unknown
       if (guess_three == NULL) {
           strcpy(guesses[0], guess_one->pos_word);
@@ -474,9 +477,10 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
           return;
       }
 
+      // iterates through possible words
       while (ptr->pos_word[letterPosition] == letter) {
         if (!guessed(ptr->pos_word)) {
-          GetHighestScores(guess_one, guess_two, guess_three, ptr);
+          GetHighestScores(guess_one, guess_two, guess_three, ptr); // returns highest scoring three of the four for each word
         }
         ptr = ptr->next;
           if (ptr == NULL) {
@@ -494,7 +498,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   append(guess_three->pos_word);
   append(guess_two->pos_word);
   append(guess_one->pos_word);
-}
+  }
 
 
 
@@ -516,8 +520,9 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
 
 // values for bool: true (1), false (0)
 
+// used to help improve accuracy and help our algorithm learn
 void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
-    if (isCorrectGuess == 1) {
+    if (isCorrectGuess == 1) { // if we guess correctly, increments the score of the word and frees the memory from the previously guessed list
         free(PrevGuessed);
         PrevGuessed = NULL;
         int index_1, index_2;
@@ -529,7 +534,7 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
         index_2 = correctWord[1] % 97;
         find_word(correctWord, index_1, index_2);
     }
-    if (isCorrectGuess == 0 && correctWord != NULL) {
+    if (isCorrectGuess == 0 && correctWord != NULL) { // if we guess incorrectly, increments to word so it has been used more, or add the word to the list if it is not in our database
         free(PrevGuessed);
         PrevGuessed = NULL;
         int index_1, index_2;
