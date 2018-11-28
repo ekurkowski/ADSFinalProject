@@ -26,8 +26,6 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,
 	   char guesses[NUM_GUESSES][MAX_WORDLEN+1]);
 
 void feedbackSmartWord(bool isCorrectGuess, char *correctWord);
-int find_word(char word[100],int index,int index_2);
-void remove_special_c(char word[100],int len);
 
 
 #endif

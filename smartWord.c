@@ -20,6 +20,8 @@
 
 #include "smartWord.h"
 
+int find_word(char word[100],int index,int index_2);
+void remove_special_c(char word[100],int len);
 
 // first table for the alphabet
 struct hash{
@@ -60,7 +62,7 @@ void insert_wordsfile(char word[100],int index,int index_2){
 	Word *new_node = (Word*) malloc(sizeof(Word));
 	strcpy(new_node->pos_word,word);
 	new_node->next = NULL;
-	new_node->score = 1;
+	new_node->score = 0;
 
 	if(list->head == NULL){ //if list is empty in index
 		list->head = new_node;
@@ -74,13 +76,13 @@ void insert_wordsfile(char word[100],int index,int index_2){
 }
 
 // inserts words form the old messages in alphabetical order
-void insert_oldMes(char word[100],int index,int index_2){
+void insert_oldMes(char word[100],int index,int index_2, int score){
 	struct node *temp,*prev = NULL;
 	struct node *list = (struct node*) alpha_hash[index]->range[index_2]->head;
 	struct node *new_node = (struct node*) malloc(sizeof(struct node));
 	strcpy(new_node->pos_word,word);
 	new_node->next = NULL;
-	new_node->score = 1;
+	new_node->score = score;
 	
 
 	if(list == NULL){ //if list is empty 
@@ -191,7 +193,7 @@ void procOldMsgSmartWord(char *wordFile){
   	found_ctr = find_word(word,f_c_value,s_c_value);
 
   	if(found_ctr == 0){ //if word was not found it will insert it into the structure
-  		insert_oldMes(word,f_c_value,s_c_value);
+  		insert_oldMes(word,f_c_value,s_c_value, 2);
   	}
   }
 	return ;
@@ -538,7 +540,7 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
         index_1 = correctWord[0] % 97;
         index_2 = correctWord[1] % 97;
         if (!find_word(correctWord, index_1, index_2)) {
-            insert_oldMes(correctWord, index_1, index_2);
+            insert_oldMes(correctWord, index_1, index_2, 3);
         }
     }
 }
