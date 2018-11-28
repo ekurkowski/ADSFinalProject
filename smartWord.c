@@ -552,7 +552,7 @@ void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
         index_1 = correctWord[0] % 97;
         index_2 = correctWord[1] % 97;
         if (!find_word(correctWord, index_1, index_2)) {
-            insert_oldMes(correctWord, index_1, index_2, 3);
+            insert_oldMes(correctWord, index_1, index_2, 1);
         }
     }
 }
