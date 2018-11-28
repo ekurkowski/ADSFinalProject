@@ -281,24 +281,30 @@ struct inter *StartGuess = NULL; // keeps track of where word being guessed begi
 Word *beginGuess = NULL;   // keeps track of second letter of word being guessed
 Word *PrevGuessed = NULL; // list of the previously guessed for each word. Resets after word has been guessed
 int hashval = 0; // which letter the word starts with
+Word *guess_one; // pointers to each of the nodes containing the possible guesses
+Word *guess_two;
+Word *guess_three;
 
 // return the highest three scores out of the four
-void GetHighestScores(Word *one, Word *two, Word *three, Word *four) {
-  Word *temp;
-  if (three->score < four->score) {
-	  if (two->score < four->score) {
-		  if (one->score < four->score) {
-			  temp = one;
-			  one = four;
-			  three = two;
-			  two = temp;
+void GetHighestScores(Word *four) {
+  Word *temp = NULL;
+  if (guess_three->score < four->score) {
+	  if (guess_two->score < four->score) {
+		  if (guess_one->score < four->score) {
+			  temp = guess_one;
+			  guess_one = four;
+			  guess_three = guess_two;
+			  guess_two = temp;
+              return;
 		  } else {
-			  temp = two;
-			  two = four;
-			  three = temp;
+			  temp = guess_two;
+			  guess_two = four;
+			  guess_three = temp;
+              return;
 		  }
 	  } else {
-		  three = four;
+		  guess_three = four;
+          return;
 	  }
   } else {
 	  return;
@@ -334,11 +340,10 @@ void append(char word[MAX_WORDLEN]) {
 // Return via a parameter:
 //   gueses: NUM_GUESSES (3) word guesses (case-insensive comparison is used)
 
+
 void guessSmartWord(char letter, int letterPosition, int wordPosition,char guesses[NUM_GUESSES][MAX_WORDLEN+1]) {
   Word *ptr = NULL;
-  Word *guess_one; // pointers to each of the nodes containing the possible guesses
-  Word *guess_two;
-  Word *guess_three;
+
   letter = tolower(letter);
   // pay attention to upper and lowercase input, this standardizes the letters to lowercase
 
@@ -380,7 +385,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
       while (ptr != NULL) {
         if (!guessed(ptr->pos_word)) {
             // keeps the highest three scored words out of four
-            GetHighestScores(guess_one, guess_two, guess_three, ptr);
+            GetHighestScores(ptr);
         }
         ptr = ptr->next;
       // iterate through all of the possible words and return highest three
@@ -423,7 +428,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
       // iterates through every word that begins with the two letters given
     while (ptr != StartGuess->tail) {
       if (!guessed(ptr->pos_word)) {
-        GetHighestScores(guess_one, guess_two, guess_three, ptr); // keeps highest scoring words that haven't been guessed yet
+        GetHighestScores(ptr); // keeps highest scoring words that haven't been guessed yet
       }
       ptr = ptr->next;
     }
@@ -480,7 +485,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
       // iterates through possible words
       while (ptr->pos_word[letterPosition] == letter) {
         if (!guessed(ptr->pos_word)) {
-          GetHighestScores(guess_one, guess_two, guess_three, ptr); // returns highest scoring three of the four for each word
+          GetHighestScores(ptr); // returns highest scoring three of the four for each word
         }
         ptr = ptr->next;
           if (ptr == NULL) {
@@ -499,7 +504,7 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
   append(guess_two->pos_word);
   append(guess_one->pos_word);
     
-    printf("Letter position: %d \n guesses: %s %s %s \n", letterPosition, guesses[0], guesses[1], guesses[2]);
+//    printf("Letter position: %d \n guesses: %s %s %s \n", letterPosition, guesses[0], guesses[1], guesses[2]);
   }
 
 
