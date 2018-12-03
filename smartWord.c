@@ -1,13 +1,16 @@
 /*
 
   Authors (group members): Elizabeth Kurkowski, Kyle Sergio, Austin Gaudio, Gabrielle Heughins
-  Email addresses of group members: ekurkowski2016@my.fit.edu
+  Email addresses of group members: ekurkowski2016@my.fit.edu ksergio2017@my.fit.edu
   Group name:
 
   Course: CSE2010
   Section: 03
 
-  Description of the overall algorithm: get those words and stuff
+  Description of the overall algorithm: Words are scaned into Hashtables using separte chaining with words kept in alphabetical order and each word given an original score of 0 and 
+  after that each time the word is scaned in its incremented by 2. ON the first letter of a word it searched through the words with that letter that had the top three score.
+  Each following letter added to the word would then search for another word based on the first two letters and input a fourth word to the GetHighestScores function which sorted the top
+  three scores and made any changes if neccesary to the top three based on the new fourth input.
 	#functionsareyourbestfirends
 	#DrawPictures
 	#ifyourmainisbiggerthan100linesyoudidsomethingwrong
@@ -88,16 +91,12 @@ void insert_oldMes(char word[100],int index,int index_2, int score){
 	
 
 	if(list == NULL){ //if list is empty 
-		//printf(" F");
-		//printf("\n%s",word);
 		alpha_hash[index]->range[index_2]->head = new_node;
 		alpha_hash[index]->range[index_2]->tail = new_node;
 		
 	}
 	else{ //if list HAS MORE THAN 1 item
-		//printf("\n MORe");
 		temp = alpha_hash[index]->range[index_2]->head;
-		//printf("\n%s %s",temp->pos_word,word);
 		while(temp->next != NULL && (strcmp(temp->pos_word,word)<0)){//try to find place to add in list
 			if(strcmp(temp->pos_word,word) == 0){ //word already in 
 				return;
@@ -109,20 +108,14 @@ void insert_oldMes(char word[100],int index,int index_2, int score){
 			return;
 		}
 		if((strcmp(temp->pos_word,word) > 0) && (strcmp(temp->pos_word,alpha_hash[index]->range[index_2]->head->pos_word) == 0)){ //if added to front
-			//printf(" here1");
-			//printf("\n%s",word);
 			new_node->next = temp;
 			alpha_hash[index]->range[index_2]->head = new_node;
 		}
 		else if(temp->next == NULL && (strcmp(temp->pos_word,word)<0)){ //if added to end
-			//printf(" here2");
-			//printf("\n%s",word);
 			temp->next = new_node;
 			alpha_hash[index]->range[index_2]->tail = new_node;
 		}
 		else{ //added to middle
-			//printf(" here3");
-			//printf("\n%s",word);
 			prev->next = new_node;
 			new_node->next = temp;
 		}
@@ -509,25 +502,6 @@ void guessSmartWord(char letter, int letterPosition, int wordPosition,char guess
 //    printf("Letter position: %d \n guesses: %s %s %s \n", letterPosition, guesses[0], guesses[1], guesses[2]);
   }
 
-
-
-
-
-// feedback on the 3 guesses from the user
-// isCorrectGuess: true if one of the guesses is correct
-// correctWord: 3 cases:
-// a.  correct word if one of the guesses is correct
-// b.  null if none of the guesses is correct, before the user has typed in
-//            the last letter
-// c.  correct word if none of the guesses is correct, and the user has
-//            typed in the last letter
-// That is:
-// Case       isCorrectGuess      correctWord
-// a.         true                correct word
-// b.         false               NULL
-// c.         false               correct word
-
-// values for bool: true (1), false (0)
 
 // used to help improve accuracy and help our algorithm learn
 void feedbackSmartWord(bool isCorrectGuess, char *correctWord) {
