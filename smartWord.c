@@ -8,8 +8,10 @@
   Section: 03
 
   Description of the overall algorithm: get those words and stuff
-
-
+	#functionsareyourbestfirends
+	#DrawPictures
+	#ifyourmainisbiggerthan100linesyoudidsomethingwrong
+	
 */
 
 
@@ -62,7 +64,7 @@ void insert_wordsfile(char word[100],int index,int index_2){
 	Word *new_node = (Word*) malloc(sizeof(Word));
 	strcpy(new_node->pos_word,word);
 	new_node->next = NULL;
-	new_node->score = 0;
+	new_node->score = 2;
 
 	if(list->head == NULL){ //if list is empty in index
 		list->head = new_node;
