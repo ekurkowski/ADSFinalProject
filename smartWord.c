@@ -11,6 +11,7 @@
   after that each time the word is scaned in its incremented by 2. ON the first letter of a word it searched through the words with that letter that had the top three score.
   Each following letter added to the word would then search for another word based on the first two letters and input a fourth word to the GetHighestScores function which sorted the top
   three scores and made any changes if neccesary to the top three based on the new fourth input.
+    On feedback, if we got the word correct, it's score was incremented. If we were unable to guess the word, then we added the word to the database incase it was used again later
 	#functionsareyourbestfirends
 	#DrawPictures
 	#ifyourmainisbiggerthan100linesyoudidsomethingwrong
