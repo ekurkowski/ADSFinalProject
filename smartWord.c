@@ -1,7 +1,7 @@
 /*
 
   Authors (group members): Elizabeth Kurkowski, Kyle Sergio, Austin Gaudio, Gabrielle Heughins
-  Email addresses of group members:
+  Email addresses of group members: ekurkowski2016@my.fit.edu
   Group name:
 
   Course: CSE2010
