@@ -1,13 +1,13 @@
 /*
 
-  Authors (group members):
+  Authors (group members): Elizabeth Kurkowski, Kyle Sergio, Austin Gaudio, Gabrielle Heughins
   Email addresses of group members:
   Group name:
 
-  Course:
-  Section:
+  Course: CSE2010
+  Section: 03
 
-  Description of the overall algorithm:
+  Description of the overall algorithm: get those words and stuff
 
 
 */
@@ -133,7 +133,7 @@ void insert_oldMes(char word[100],int index,int index_2, int score){
 void initSmartWord(char *wordFile){
 
   FILE *in_file;
-  in_file = fopen(wordFile, "r");
+  in_file = fopen("20k.txt", "r"); // 20k word file from https://github.com/first20hours/google-10000-english
 	if (in_file == NULL) {
 		printf("error opening file");
 	}
